@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>My Portfolio</title>
+  <style>
+    * { margin:0; padding:0; box-sizing:border-box; }
+    body { font-family:'Georgia',serif; background:#fdf6f0; color:#4a3540; line-height:1.6; }
+
+    nav { display:flex; justify-content:center; background:#7d4e6e; position:sticky; top:0; z-index:1000; }
+    nav a { color:#fdf0f5; padding:16px 28px; text-decoration:none; font-size:0.95rem; letter-spacing:0.08em; transition:background 0.3s; }
+    nav a:hover { background:#a0647d; }
+
+    section { display:none; animation:fadeIn 0.5s ease; }
+    section.active { display:block; }
+    @keyframes fadeIn { from{opacity:0} to{opacity:1} }
+
+    .banner { width:100%; height:300px; display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center; padding:20px; color:#fff; position:relative; overflow:hidden; }
+    .banner-home    { background:linear-gradient(160deg,#f7c5d5,#e8a0b0,#c8607a); }
+    .banner-projects{ background:linear-gradient(160deg,#c9b8d8,#a98bbf,#7b5a9e); }
+    .banner-about   { background:linear-gradient(160deg,#f9d4b6,#e8a87c,#c47a45); }
+    .banner-contacts{ background:linear-gradient(160deg,#e8b4c8,#c47a98,#8b3a5a); }
+
+    .banner-home::before    { content:''; position:absolute; width:300px; height:300px; border-radius:50%; background:rgba(255,255,255,0.12); top:-80px; left:-60px; }
+    .banner-home::after     { content:''; position:absolute; width:180px; height:180px; border-radius:50%; background:rgba(255,255,255,0.10); bottom:-40px; right:10%; }
+    .banner-projects::before{ content:''; position:absolute; width:250px; height:250px; border-radius:50%; background:rgba(255,255,255,0.10); top:-60px; right:-50px; }
+    .banner-projects::after { content:''; position:absolute; width:150px; height:150px; border-radius:50%; background:rgba(255,255,255,0.08); bottom:-30px; left:8%; }
+    .banner-about::before   { content:''; position:absolute; width:280px; height:280px; border-radius:50%; background:rgba(255,255,255,0.10); bottom:-70px; right:-60px; }
+    .banner-about::after    { content:''; position:absolute; width:130px; height:130px; border-radius:50%; background:rgba(255,255,255,0.08); top:10%; left:5%; }
+    .banner-contacts::before{ content:''; position:absolute; width:220px; height:220px; border-radius:50%; background:rgba(255,255,255,0.10); top:-50px; left:20%; }
+    .banner-contacts::after { content:''; position:absolute; width:160px; height:160px; border-radius:50%; background:rgba(255,255,255,0.08); bottom:-40px; right:15%; }
+
+    .banner img.profile-pic { width:110px; height:110px; border-radius:50%; object-fit:cover; border:3px solid rgba(255,255,255,0.8); margin-bottom:14px; position:relative; z-index:1; }
+    .banner h1 { font-size:2.2rem; font-weight:normal; letter-spacing:0.05em; margin-bottom:8px; position:relative; z-index:1; }
+    .banner p  { font-size:0.95rem; opacity:0.9; letter-spacing:0.1em; position:relative; z-index:1; }
+
+    .section-body { padding:50px 20px; max-width:900px; margin:auto; }
+    #home .section-body { text-align:center; }
+    #home h2 { font-size:1.8rem; font-weight:normal; color:#c8607a; margin-bottom:15px; }
+    #home p  { font-size:1.05rem; max-width:620px; margin:auto; color:#6a4a55; }
+
+    .projects-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(240px,1fr)); gap:24px; padding:40px 20px; max-width:1000px; margin:auto; }
+
+    .project-card { background:#fff; border-radius:14px; box-shadow:0 4px 16px rgba(180,100,130,0.1); overflow:hidden; border:1px solid #f0d8e0; transition:transform 0.3s,box-shadow 0.3s; text-align:center; }
+    .project-card:hover { transform:translateY(-6px); box-shadow:0 10px 24px rgba(180,100,130,0.18); }
+
+    /* Image wrapper */
+    .project-card .img-wrapper { position:relative; overflow:hidden; background:#1a1a1a; }
+    .project-card .img-wrapper img { width:100%; height:160px; object-fit:cover; display:block; cursor:zoom-in; transition:transform 0.3s ease,filter 0.3s ease; }
+    .project-card .img-wrapper:hover img { transform:scale(1.04); filter:brightness(0.75); }
+
+    /* Video wrapper */
+    .project-card .vid-wrapper { position:relative; overflow:hidden; background:#000; cursor:pointer; height:160px; }
+    .project-card .vid-wrapper video { width:100%; height:160px; object-fit:cover; display:block; transition:transform 0.3s ease,filter 0.3s ease; }
+    .project-card .vid-wrapper:hover video { transform:scale(1.04); filter:brightness(0.65); }
+    .project-card .vid-wrapper .play-icon { position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); font-size:3rem; color:#fff; text-shadow:0 2px 14px rgba(0,0,0,0.8); opacity:1; transition:opacity 0.2s; pointer-events:none; }
+
+    /* Shared hint pill */
+    .zoom-hint { position:absolute; bottom:8px; left:50%; transform:translateX(-50%); background:rgba(0,0,0,0.6); color:#fff; font-size:0.72rem; padding:3px 10px; border-radius:20px; white-space:nowrap; pointer-events:none; opacity:0; transition:opacity 0.2s; }
+    .img-wrapper:hover .zoom-hint,
+    .vid-wrapper:hover .zoom-hint { opacity:1; }
+
+    .project-card .card-body { padding:18px; }
+    .project-card h3 { color:#7b5a9e; margin-bottom:8px; font-weight:normal; font-size:1.1rem; }
+    .project-card p  { font-size:0.9rem; color:#888; }
+
+    #about .section-body { background:linear-gradient(135deg,#fde8d8,#f5c6b0); border-radius:14px; padding:40px; max-width:800px; border:1px solid #e8c0a0; }
+    #about h2 { font-size:1.8rem; font-weight:normal; color:#c47a45; margin-bottom:15px; }
+    #about p  { font-size:1.05rem; color:#6a4a35; }
+
+    #contacts .section-body { text-align:center; }
+    #contacts h2 { font-size:1.8rem; font-weight:normal; color:#8b3a5a; margin-bottom:20px; }
+    #contacts ul { list-style:none; font-size:1.05rem; }
+    #contacts li { margin:12px 0; color:#6a4a55; }
+
+    footer { text-align:center; padding:20px; background:#7d4e6e; color:#f9e8f0; margin-top:40px; font-size:0.9rem; letter-spacing:0.05em; }
+
+    /* Lightbox */
+    #lightbox { display:none; position:fixed; inset:0; z-index:9999; background:rgba(0,0,0,0.92); justify-content:center; align-items:center; padding:20px; box-sizing:border-box; cursor:zoom-out; }
+    #lightbox.active { display:flex; animation:lbFade 0.2s ease; }
+    @keyframes lbFade { from{opacity:0} to{opacity:1} }
+    @keyframes lbPop  { from{transform:scale(0.82);opacity:0} to{transform:scale(1);opacity:1} }
+
+    #lb-img   { max-width:95vw; max-height:90vh; width:auto; height:auto; object-fit:contain; border-radius:10px; box-shadow:0 25px 80px rgba(0,0,0,0.8); cursor:default; animation:lbPop 0.28s cubic-bezier(0.34,1.56,0.64,1); }
+    #lb-video { display:none; max-width:95vw; max-height:90vh; border-radius:10px; box-shadow:0 25px 80px rgba(0,0,0,0.8); cursor:default; animation:lbPop 0.28s cubic-bezier(0.34,1.56,0.64,1); }
+
+    #lb-close { position:fixed; top:16px; right:20px; background:rgba(255,255,255,0.18); border:none; color:#fff; font-size:1.3rem; width:42px; height:42px; border-radius:50%; cursor:pointer; display:flex; align-items:center; justify-content:center; transition:background 0.2s,transform 0.2s; z-index:10000; }
+    #lb-close:hover { background:rgba(255,255,255,0.35); transform:rotate(90deg); }
+  </style>
+</head>
+<body>
+
+<nav>
+  <a href="#" onclick="showSection('home')">Home</a>
+  <a href="#" onclick="showSection('projects')">My Projects</a>
+  <a href="#" onclick="showSection('about')">About Me</a>
+  <a href="#" onclick="showSection('contacts')">Contacts</a>
+</nav>
+
+<!-- HOME -->
+<section id="home" class="active">
+  <div class="banner banner-home">
+    <img src="profile.jpeg" class="profile-pic" alt="My Profile Picture">
+    <h1>Hello, I'm Meriniel Gomez</h1>
+    <p>BS Computer Science &nbsp;|&nbsp; 2nd Year Student</p>
+  </div>
+  <div class="section-body">
+    <h2>Welcome to My Portfolio</h2>
+    <p>Dive into my world of creativity and technology. Here you'll find my projects, my story, and ways to connect. Let's build something amazing together!</p>
+  </div>
+</section>
+
+<!-- PROJECTS -->
+<section id="projects">
+  <div class="banner banner-projects">
+    <h1>My Projects</h1>
+    <p>A collection of things I have built and learned from.</p>
+  </div>
+  <div class="projects-grid">
+
+    <!-- Project 1 -->
+    <div class="project-card">
+      <div class="img-wrapper">
+        <img src="Pathfit.jpg" alt="Project 1" onerror="this.style.display='none'" onclick="openLightboxImg(this)">
+        <span class="zoom-hint">🔍 Click to enlarge</span>
+      </div>
+      <div class="card-body">
+        <h3>PATHFIT 4</h3>
+        <p>This photo shows our PATHFIT 4 cheerdance performance, where we demonstrated teamwork, coordination, and energy through synchronized movements in front of an audience.</p>
+      </div>
+    </div>
+
+    <!-- Project 2 -->
+    <div class="project-card">
+      <div class="img-wrapper">
+        <img src="Futuristic.jpg" alt="Project 2" onerror="this.style.display='none'" onclick="openLightboxImg(this)">
+        <span class="zoom-hint">🔍 Click to enlarge</span>
+      </div>
+      <div class="card-body">
+        <h3>Futuristic Building Diorama</h3>
+        <p>This photo shows our futuristic diorama project, where we created model buildings and a modern city design. After completing the project, we explained the purpose and features of each structure. The project showed our creativity and teamwork in building a vision of a future city.</p>
+      </div>
+    </div>
+
+    <!-- Project 3 -->
+    <div class="project-card">
+      <div class="img-wrapper">
+        <img src="Bahandi booth.jpg" alt="Project 3" onerror="this.style.display='none'" onclick="openLightboxImg(this)">
+        <span class="zoom-hint">🔍 Click to enlarge</span>
+      </div>
+      <div class="card-body">
+        <h3>Bahandi Booth</h3>
+        <p>This photo shows our Bahandi booth project, which we created for a competition. We designed and decorated the booth creatively and used it to sell drinks.</p>
+      </div>
+    </div>
+
+    <!-- Project 4-->
+    <div class="project-card">
+      <div class="img-wrapper">
+        <img src="Arduino Robot.jpg" alt="Project 4" onerror="this.style.display='none'" onclick="openLightboxImg(this)">
+        <span class="zoom-hint">🔍 Click to enlarge</span>
+      </div>
+      <div class="card-body">
+        <h3>Arduino Robot Car</h3>
+        <p>This photo shows our Arduino Robot Car, which we built the robot step by step, added the codes, and tested it until it worked properly. After finishing the project, we presented and defended it to our instructor, which helped us gain more knowledge and confidence.</p>
+      </div>
+    </div>
+
+    <!-- project5 -->
+    <div class="project-card">
+      <div class="vid-wrapper" onclick="openLightboxVideo('project5.mp4')">
+        <video id="p5-preview" src="project5.mp4" muted loop playsinline autoplay onerror="this.style.display='none'"></video>
+        <span class="play-icon" id="p5-play-icon">&#9654;</span>
+        <span class="zoom-hint">&#9654; Click to play</span>
+      </div>
+      <div class="card-body">
+        <h3>Video Pitching</h3>
+        <p>This shows our Job Sync pitching project where we created promotional media explaining how the app helps people find jobs more easily and conveniently.</p>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- ABOUT -->
+<section id="about">
+  <div class="banner banner-about">
+    <h1>About Me</h1>
+    <p>Get to know the person behind the code.</p>
+  </div>
+  <div class="section-body">
+    <h2>Who Am I?</h2>
+    <p>I am a Computer Science student who is passionate about learning technology and improving my skills in programming and problem-solving. I enjoy working on projects that help me gain knowledge and experience in the field.</p>
+    <h2>Skills</h2>
+    <ul>
+      <li>Basic Programming</li>
+      <li>HTML and CSS</li>
+      <li>Arduino Programming</li>
+      <li>Problem Solving</li>
+      <li>Teamwork</li>
+    </ul>
+    <h2>Hobbies</h2>
+    <ul>
+      <li>Watching videos</li>
+      <li>Playing mobile games</li>
+      <li>Learning new technology</li>
+      <li>Listening to music</li>
+      <li>Spending time with family and friends</li>
+    </ul>
+  </div>
+</section>
+
+<!-- CONTACTS -->
+<section id="contacts">
+  <div class="banner banner-contacts">
+    <h1>Contacts</h1>
+    <p>Feel free to reach out anytime.</p>
+  </div>
+  <div class="section-body">
+    <h2>Get In Touch</h2>
+    <ul>
+      <li>Email: merinielgomez@gmail.com</a></li>
+      <li>Phone: 09127205894</li>
+      <li>Facebook: https://www.facebook.com/meriniel.gomez</li>
+      <li>Instagram: @angeliccmoon_1020</li>
+    </ul>
+  </div>
+</section>
+
+<footer>
+  <p>&copy; 2026 My Portfolio | Designed with passion</p>
+</footer>
+
+<!-- LIGHTBOX -->
+<div id="lightbox" onclick="closeLightbox()">
+  <button id="lb-close" onclick="closeLightbox()">&#10005;</button>
+  <img id="lb-img" src="" alt="">
+  <video id="lb-video" controls></video>
+</div>
+
+<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
+  function showSection(id) {
+    document.querySelectorAll('section').forEach(s => s.classList.remove('active'));
+    document.getElementById(id).classList.add('active');
+  }
+
+  function openLightboxImg(img) {
+    var lb = document.getElementById('lightbox');
+    var lbImg = document.getElementById('lb-img');
+    var lbVid = document.getElementById('lb-video');
+    lbVid.pause();
+    lbVid.style.display = 'none';
+    lbImg.src = img.src;
+    lbImg.alt = img.alt;
+    lbImg.style.display = 'block';
+    lb.classList.add('active');
+    document.body.style.overflow = 'hidden';
+  }
+
+  function openLightboxVideo(src) {
+    var lb = document.getElementById('lightbox');
+    var lbImg = document.getElementById('lb-img');
+    var lbVid = document.getElementById('lb-video');
+    lbImg.style.display = 'none';
+    lbVid.style.display = 'block';
+    lbVid.src = src;
+    lbVid.currentTime = 0;
+    lb.classList.add('active');
+    document.body.style.overflow = 'hidden';
+    lbVid.play();
+  }
+
+  function closeLightbox() {
+    var lb = document.getElementById('lightbox');
+    var lbVid = document.getElementById('lb-video');
+    lb.classList.remove('active');
+    lbVid.pause();
+    lbVid.src = '';
+    document.body.style.overflow = '';
+  }
+
+  document.getElementById('lb-img').addEventListener('click', function(e){ e.stopPropagation(); });
+  document.getElementById('lb-video').addEventListener('click', function(e){ e.stopPropagation(); });
+  document.getElementById('lb-close').addEventListener('click', function(e){ e.stopPropagation(); closeLightbox(); });
+  document.addEventListener('keydown', function(e){ if(e.key === 'Escape') closeLightbox(); });
+  // Autoplay muted preview in card
+  var prev = document.getElementById('p5-preview');
+  if (prev) { prev.play().catch(function(){}); }
+</script>
+</body>
+</html>
